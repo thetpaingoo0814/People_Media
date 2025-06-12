@@ -1,0 +1,244 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:people_media/models/Cat.dart';
+import 'package:people_media/models/Tag.dart';
+import 'package:people_media/providers/CatProvider.dart';
+import 'package:people_media/providers/PostProvider.dart';
+import 'package:people_media/providers/TagProvider.dart';
+import 'package:people_media/utils/Kop.dart';
+import 'package:people_media/utils/Routes.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import '../../models/Post.dart';
+import '../../utils/Vary.dart';
+
+class PostEdit extends StatefulWidget {
+  final Post post;
+  const PostEdit({super.key, required this.post});
+
+  @override
+  State<PostEdit> createState() => _PostEditState(post: post);
+}
+
+class _PostEditState extends State<PostEdit> {
+  Post post;
+  _PostEditState({required this.post});
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+
+  String catHint = "Choose Category";
+  String tagHit = "Choose Tag";
+  String selectedCatId = "Choose Category";
+  String selectedTagId = "Choose Tag";
+
+  List<File> files = [];
+  bool isFile = false;
+
+  @override
+  void initState() {
+    _titleController.text = post.title;
+    _contentController.text = post.content;
+    selectedCatId = post.category;
+    selectedTagId = post.tag;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var catProvider = Provider.of<CatProvider>(context);
+    var tagProvider = Provider.of<TagProvider>(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      catProvider.invoke();
+      tagProvider.invoke();
+    });
+
+    return Scaffold(
+      appBar: AppBar(centerTitle: true, title: Text("Add New Post")),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8.0),
+          child: Column(
+            children: [
+              DropdownButton<Cat>(
+                hint: Text(catHint),
+                items:
+                    catProvider.cats.map((Cat cat) {
+                      return DropdownMenuItem<Cat>(
+                        value: cat,
+                        child: Text(cat.name),
+                      );
+                    }).toList(),
+                onChanged: (cat) {
+                  selectedCatId = cat!.id;
+                  setState(() {
+                    catHint = cat.name;
+                  });
+                },
+              ),
+              SizedBox(height: 20),
+              DropdownButton<Tag>(
+                hint: Text(tagHit),
+                items:
+                    tagProvider.tags.map((Tag tag) {
+                      return DropdownMenuItem<Tag>(
+                        value: tag,
+                        child: Text(tag.name),
+                      );
+                    }).toList(),
+                onChanged: (tag) {
+                  selectedTagId = tag!.id;
+                  tagHit = tag.name;
+                  setState(() {});
+                },
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _titleController,
+                onChanged: (value) {},
+                decoration: InputDecoration(
+                  labelText: "Title",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green, width: 10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _contentController,
+                minLines: 5,
+                maxLines: 5,
+                onChanged: (value) {},
+                decoration: InputDecoration(
+                  labelText: "Content",
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green, width: 10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  final ImagePicker picker = ImagePicker();
+                  final pickFiles = await picker.pickMultiImage();
+                  if (pickFiles.isNotEmpty) {
+                    files = pickFiles.map((pFile) => File(pFile.path)).toList();
+                    isFile = true;
+                    setState(() {});
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pinkAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                ),
+                child: Text(
+                  "Upload Image",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              SizedBox(height: 50),
+              Row(
+                children: List.generate(post.images.length, (index) {
+                  return SizedBox(
+                    width: 100,
+                    child: Image.network(post.images[index]),
+                  );
+                }),
+              ),
+              isFile
+                  ? Row(
+                    children: List.generate(files.length, (index) {
+                      return SizedBox(
+                        width: 100,
+                        child: Image.file(files[index]),
+                      );
+                    }),
+                  )
+                  : SizedBox(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (isFile) {
+                        var request = http.MultipartRequest(
+                          "PATCH",
+                          Uri.parse("$POST_URL/${post.id}"),
+                        );
+                        request.fields["title"] = _titleController.text;
+                        request.fields["content"] = _contentController.text;
+                        request.fields["category"] = selectedCatId;
+                        request.fields["tag"] = selectedTagId;
+                        for (var file in files) {
+                          request.files.add(
+                            await http.MultipartFile.fromPath(
+                              "files",
+                              file.path,
+                            ),
+                          );
+                        }
+                        request.headers["authorization"] =
+                            "bearer ${Vary.token}";
+                        var response = await request.send();
+                        var responsed = await http.Response.fromStream(
+                          response,
+                        );
+                        final result = json.decode(responsed.body);
+                        bool con = result["con"] as bool;
+                        if (con) {
+                          await Provider.of<PostProvider>(
+                            context,
+                            listen: false,
+                          ).getAll();
+                          Kpo.successToast(context, "Post ထည့်တာ အောင်မြင်တယ်");
+                          Navigator.pop(context);
+                        } else {
+                          Kpo.errorToast(context, "Post ဖန်တီးတာ ပြဿနာရှိတယ်၊");
+                        }
+                      } else {
+                        bool success = await Provider.of<PostProvider>(
+                          context,
+                          listen: false,
+                        ).update(
+                          post.id,
+                          _titleController.text,
+                          _contentController.text,
+                          selectedCatId,
+                          selectedTagId,
+                        );
+                        if (success) {
+                          Kpo.successToast(
+                            context,
+                            "Post Edit တာ အောင်မြင်တယ်",
+                          );
+                          Navigator.pop(context);
+                        } else {
+                          Kpo.errorToast(context, "Post Edit တာ ပြဿနာရှိတယ်၊");
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                    ),
+                    child: Text(
+                      "Update",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

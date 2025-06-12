@@ -1,0 +1,19 @@
+Api
+    - Get All Active Advs
+    - Get Paginated Post 
+    - Get Paginated Post By Author
+    - Get Paginated Post By Tag 
+    - Add Comments 
+    - Add Like 
+    - Add Get Me 
+    - Get All Categories
+    - Get All Tags 
+
+Flutter Admin 
+Flutter User App
+
+ကျောင်းသားတွေ မေးထားတာ ပြန်ပြောပေးရန် 
+    - Security
+    - Restful Api 
+    - Full Stack 
+    - Api data Vs Plain Data ( Static Page, Dynmaic Page [view Engine])
