@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:people_media/models/Comment.dart';
-import 'package:people_media/pages/CommentPage.dart';
 import 'package:people_media/providers/CommentProvider.dart';
 import 'package:people_media/providers/PostProvider.dart';
 import 'package:people_media/providers/UserProvider.dart';
