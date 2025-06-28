@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:people_media/utils/Routes.dart';
 
 class Utilprovider extends ChangeNotifier {
+  // ignore: non_constant_identifier_names
   String local_app_version = "1.0.1";
   bool _isLoading = false; 
   bool _showTitle = false;
