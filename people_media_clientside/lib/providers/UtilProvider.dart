@@ -6,7 +6,7 @@ import 'package:people_media/utils/Routes.dart';
 
 class Utilprovider extends ChangeNotifier {
   String local_app_version = "1.0.1";
-  bool _isLoading = false;
+  bool _isLoading = false; 
   bool _showTitle = false;
   String _error = "";
   bool get isLoading => _isLoading;

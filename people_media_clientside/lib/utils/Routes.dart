@@ -1,5 +1,5 @@
 // const String BASE_URL = "http://localhost:3000";
-const String BASE_URL = "http://192.168.100.41:3000";
+const String BASE_URL = "http://192.168.0.34:3000";
 
 const String USER_URL = "$BASE_URL/users";
 const String CAT_URL = "$BASE_URL/cats";
