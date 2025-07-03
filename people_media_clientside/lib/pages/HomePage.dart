@@ -20,11 +20,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   int currentIndex = 0;
 
   List<String> images = [
-    "assets/images/Flutter-Static.png",
-    "assets/images/Java-Static.png",
-    "assets/images/Node-Static.png",
-    "assets/images/PHP-Static.png",
-    "assets/images/Python-Static.png",
+    "assets/images/hello.jpg",
+    "assets/images/car1.jpg",
+    "assets/images/fashion.jpg",
+    "assets/images/technology1.png",
+    "assets/images/phone.png",
   ];
 
   String sampleText =

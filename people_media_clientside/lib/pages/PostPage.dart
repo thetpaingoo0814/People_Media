@@ -29,11 +29,11 @@ class _PostPageState extends State<PostPage> {
   String id;
   _PostPageState({required this.id});
   List<String> images = [
-    "assets/images/Flutter-Static.png",
-    "assets/images/Java-Static.png",
-    "assets/images/Node-Static.png",
-    "assets/images/PHP-Static.png",
-    "assets/images/Python-Static.png",
+    "assets/images/car1.jpg",
+    "assets/images/fashion.jpg",
+    "assets/images/hello.jpg",
+    "assets/images/phone.png",
+    "assets/images/technology1.png",
   ];
   bool isFile = false;
   late File file;
