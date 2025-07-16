@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,7 +23,8 @@ class PostPage extends StatefulWidget {
   const PostPage({super.key, required this.id});
 
   @override
-  State<PostPage> createState() => _PostPageState(id: id);
+  // ignore: no_logic_in_create_state
+  State<PostPage> createState() => _PostPageState(id:id);
 }
 
 class _PostPageState extends State<PostPage> {
