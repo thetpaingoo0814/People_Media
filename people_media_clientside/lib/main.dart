@@ -91,9 +91,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-/*
-  BLOC - Riverpod
-  Clean Architecture
-  BLOC - Provider
-*/

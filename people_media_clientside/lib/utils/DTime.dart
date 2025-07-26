@@ -1,3 +1,5 @@
+// This code is create by M23W7502_ThetPaingOo
+
 class DTime {
   static String getDifferent(DateTime checkTime) {
     DateTime now = DateTime.now();
